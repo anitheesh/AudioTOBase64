@@ -1,20 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AudioTOBase64.Repository;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AudioTOBase64.Controllers
 {
     public class AudioController : Controller
     {
-       
+        private readonly HttpClient _httpClient;
+
+
+
         public IActionResult Index()
         {
             return View();
         }
-        public async Task<IActionResult> UploadAudioFile()
+
+        public IActionResult UploadAudioFile()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> UploadAudioFile([FromForm] Models.Class model)
         {
@@ -29,10 +38,11 @@ namespace AudioTOBase64.Controllers
                 {
                     await model.File.CopyToAsync(memoryStream);
 
-                    
                     string base64String = Convert.ToBase64String(memoryStream.ToArray());
+                    Audio ad = new Audio(_httpClient);
+                    await ad.PostToExternalApi(base64String);
 
-                    return Ok(base64String);
+                    return View();
                 }
             }
             catch (Exception ex)
@@ -40,6 +50,5 @@ namespace AudioTOBase64.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-       
     }
 }
