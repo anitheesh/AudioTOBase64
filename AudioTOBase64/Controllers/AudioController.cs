@@ -10,8 +10,7 @@ namespace AudioTOBase64.Controllers
 {
     public class AudioController : Controller
     {
-        private readonly HttpClient _httpClient;
-
+       
 
 
         public IActionResult Index()
@@ -34,16 +33,12 @@ namespace AudioTOBase64.Controllers
 
             try
             {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    await model.File.CopyToAsync(memoryStream);
-
-                    string base64String = Convert.ToBase64String(memoryStream.ToArray());
-                    Audio ad = new Audio(_httpClient);
-                    await ad.PostToExternalApi(base64String);
+               
+                    Audio ad = new Audio();
+                    ad.PostAudio(model);
 
                     return View();
-                }
+                
             }
             catch (Exception ex)
             {

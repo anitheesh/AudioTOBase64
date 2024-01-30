@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AudioTOBase64.Models;
+using System;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,11 +9,16 @@ namespace AudioTOBase64.Repository
 {
     public class Audio
     {
-        private readonly HttpClient _httpClient;
-
-        public Audio(HttpClient httpClient)
+        //Audio to base64
+        public async Task<string> PostAudio(Class model)
         {
-            _httpClient = httpClient;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                await model.File.CopyToAsync(memoryStream);
+
+                string base64String = Convert.ToBase64String(memoryStream.ToArray());
+                return await PostToExternalApi(base64String);
+            }
         }
 
         public async Task<string> PostToExternalApi(string base64String)
@@ -26,7 +33,6 @@ namespace AudioTOBase64.Repository
             var payload = new
             {
                 audio = encodedString
-               
             };
 
             try
@@ -34,18 +40,23 @@ namespace AudioTOBase64.Repository
                 // Serialize the payload to JSON
                 string jsonPayload = System.Text.Json.JsonSerializer.Serialize(payload);
 
-                // Post the JSON data to the external API
-                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await _httpClient.PostAsync(externalApiUrl, content);
+                // Make a POST request to the external API
+                using (var httpClient = new HttpClient())
+                {
+                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                    var response = await httpClient.PostAsync(externalApiUrl, content);
 
-                // Check if the request was successful
-                response.EnsureSuccessStatusCode();
-
-                // Read the response content
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                // Return the response
-                return responseBody;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Read and return response content
+                        return await response.Content.ReadAsStringAsync();
+                    }
+                    else
+                    {
+                        // If the request fails, throw an exception with the error message
+                        throw new Exception($"External API request failed: {response.ReasonPhrase}");
+                    }
+                }
             }
             catch (HttpRequestException ex)
             {
