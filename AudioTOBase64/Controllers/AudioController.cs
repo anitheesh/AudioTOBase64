@@ -1,4 +1,5 @@
-﻿using AudioTOBase64.Repository;
+﻿using AudioTOBase64.Models;
+using AudioTOBase64.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
@@ -17,12 +18,12 @@ namespace AudioTOBase64.Controllers
         {
             return View();
         }
-
+       
+        
         public IActionResult UploadAudioFile()
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> UploadAudioFile([FromForm] Models.Class model)
         {
@@ -35,9 +36,13 @@ namespace AudioTOBase64.Controllers
             {
                 Audio audioRepository = new Audio();
                 string response = await audioRepository.PostAudio(model);
-
+                ViewBag.EmployeeID = model.EmployeeID;
+                ViewBag.Email = model.Email;
+                ViewBag.Time = DateTime.Now;
+                ViewBag.Base64String = response;
                 // Pass the response value to the view
-                return View("UploadedAudio", response);
+                //return RedirectToAction("ResponseView");
+                return View();
             }
             catch (Exception ex)
             {

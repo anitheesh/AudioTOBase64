@@ -10,18 +10,25 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>UploadAudioFile</title>
-    <!-- Include necessary styles or libraries here -->
-    <!-- For example, if using Bootstrap: -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
 <body>
 
-    <h4>Upload Audio File</h4>
-    <hr />
+<h4>Class</h4>
+<hr />
     <div class="row">
         <div class="col-md-4">
             <form asp-action="UploadAudioFile" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="EmployeeID" class="control-label"></label>
+                    <input asp-for="EmployeeID" class="form-control" />
+                    <span asp-validation-for="EmployeeID" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
                 <div class="form-group">
                     <label for="audioFile">Choose Audio File:</label>
                     <input type="file" name="file" id="audioFile" class="form-control" accept=".mp3, .wav, .ogg" required />
@@ -30,6 +37,19 @@
                     <input type="submit" value="Upload" class="btn btn-primary" />
                 </div>
             </form>
+            
+            <div>
+                @if (ViewData["EmployeeID"] != null)
+                {
+                    <div>
+                        Employee ID: @ViewData["EmployeeID"]<br />
+                        Email: @ViewData["Email"]<br />
+                        Time: @ViewData["Time"]<br />
+                        Base64 String: @ViewData["Base64String"]<br />
+                    </div>
+                }
+            </div>
+
         </div>
     </div>
 
@@ -37,16 +57,5 @@
         <a asp-action="Index">Back to List</a>
     </div>
 
-    <!-- Include necessary scripts or libraries here -->
-    <!-- For example, if using Bootstrap: -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-    @section Scripts {
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        }
-    }
 </body>
 </html>

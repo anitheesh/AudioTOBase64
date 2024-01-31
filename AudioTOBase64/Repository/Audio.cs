@@ -1,4 +1,5 @@
-﻿using AudioTOBase64.Models;
+﻿// Audio class
+using AudioTOBase64.Models;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -9,7 +10,7 @@ namespace AudioTOBase64.Repository
 {
     public class Audio
     {
-        //Audio to base64
+        // Audio to base64
         public async Task<string> PostAudio(Class model)
         {
             using (MemoryStream memoryStream = new MemoryStream())
@@ -17,14 +18,15 @@ namespace AudioTOBase64.Repository
                 await model.File.CopyToAsync(memoryStream);
 
                 string base64String = Convert.ToBase64String(memoryStream.ToArray());
-                return await PostToExternalApi(base64String);
+                return await PostToExternalApi(base64String, model);
             }
         }
-
-        public async Task<string> PostToExternalApi(string base64String)
+        public string covertString;
+        public async Task<string> PostToExternalApi(string base64String, Class model)
         {
+
             // Adjust the external API endpoint URL
-            string externalApiUrl = "https://example.com/api/upload";
+            string externalApiUrl = "https://localhost:7189/api/Values";
 
             // Encode the Base64 string for query parameter
             string encodedString = Uri.EscapeDataString(base64String);
@@ -32,7 +34,9 @@ namespace AudioTOBase64.Repository
             // Construct the JSON payload
             var payload = new
             {
-                audio = encodedString
+                model.EmployeeID,
+                model.Email,
+                File = encodedString, // Make sure this matches the property name expected by the server
             };
 
             try
@@ -48,8 +52,18 @@ namespace AudioTOBase64.Repository
 
                     if (response.IsSuccessStatusCode)
                     {
-                        // Read and return response content
-                        return await response.Content.ReadAsStringAsync();
+                        covertString = encodedString;
+
+                        var responseMessage = new
+                        {
+                            model.EmployeeID,
+                            model.Email,
+                            System.DateTime.Now,
+                            encodedString,
+                           
+                        };
+                        string json = System.Text.Json.JsonSerializer.Serialize(responseMessage);
+                        return encodedString;
                     }
                     else
                     {
