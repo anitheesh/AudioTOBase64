@@ -33,17 +33,17 @@ namespace AudioTOBase64.Controllers
 
             try
             {
-               
-                    Audio ad = new Audio();
-                    ad.PostAudio(model);
+                Audio audioRepository = new Audio();
+                string response = await audioRepository.PostAudio(model);
 
-                    return View();
-                
+                // Pass the response value to the view
+                return View("UploadedAudio", response);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
     }
 }
