@@ -18,8 +18,14 @@ namespace AudioTOBase64.Controllers
         {
             return View();
         }
-       
-        
+
+        public IActionResult resultPage()
+        {
+            string checkstring = TempData["checkstring"] as string;
+            ViewBag.checkstring = checkstring;
+            return View();
+        }
+
         public IActionResult UploadAudioFile()
         {
             return View();
@@ -40,9 +46,9 @@ namespace AudioTOBase64.Controllers
                 ViewBag.Email = model.Email;
                 ViewBag.Time = DateTime.Now;
                 ViewBag.Base64String = response;
-                // Pass the response value to the view
-                //return RedirectToAction("ResponseView");
-                return View();
+                string checkstring = response.Substring(0, 3);
+                TempData["checkstring"] = checkstring;
+                return RedirectToAction("resultPage");
             }
             catch (Exception ex)
             {

@@ -1,0 +1,105 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap">
+    <style>
+        .container{
+           height:350px;
+            width: 60%;
+            margin-top: 80px;
+            margin-left: 20%;
+            align-items: center;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+            padding-top:25px;
+            padding: 40px 25px 25px 25px;
+            display:flex;
+            
+        }
+
+        .voiceLive{
+           height:100%;
+            width:58%;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+            padding:10px;
+        }
+
+        
+
+        .button-blue {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+            background-color: blue;
+            color: white;
+            border-radius: 5px;
+        }
+
+            .button-blue:hover {
+                background-color: darkblue;
+            }
+
+
+        .img img {
+           
+            height: 120px;
+            width: 120px;
+        }
+        .img{
+            padding-top:45px;
+            padding-left:175px;
+        }
+
+        .info {
+            text-align: center;
+            padding-top:30px;
+            
+        }
+
+        .details {
+            padding-left: 20px;
+            padding-top:20px;
+            margin-left: 10px;
+            height: 100%;
+            width: 35%;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: "Open Sans", sans-serif; /* Applying Roboto font */
+            font-size: 15px;
+            
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="voiceLive">
+            <div class="img">
+               <img src="/css/Images/medium-volume_11452332.png"/>
+            </div>
+            <div class="info">
+                <h3>Voice Liveness</h3>
+                <p>This will be used to verify user ID</p>
+                <a class="nav-link button-blue" asp-area="" asp-controller="Audio" asp-action="UploadAudioFile">Start</a>
+            </div>
+        </div>
+        <div class="details">
+            <h3>Information</h3>
+            <hr />
+            <p>This will be used to verify user ID</p>
+        </div>
+    </div>
+</body>
+</html>
