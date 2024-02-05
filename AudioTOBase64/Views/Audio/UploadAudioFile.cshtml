@@ -5,83 +5,97 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Upload Audio File</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .container {
-            margin-top: 80px;
-           margin-left:25%;
-           width:700px;
-            align-items: center;
-            height: 100vh;
+            margin-top: 15%;
         }
 
-        #responseContainer {
-            margin-top: -100px;
-            margin-left: 25%;
-            width: 700px;
-        }
+            .container img {
+                width: 250px;
+                height: 170px;
+                margin-left: 38%;
+            }
 
-        #ConvertedString {
-            width: 700px;
-        }
-
-        .upload-form {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .file-input {
-            margin-top: 10px;
-        }
-
-        .base64-box {
-            width: 100%;
-            padding: 5px;
-            overflow-wrap: break-word; /* Wrap long strings */
-        }
-
-        body {
-            font-family: "Open Sans", sans-serif; /* Applying Roboto font */
-            font-size: 15px;
-        }
+            .container p {
+                text-align: center;
+            }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="upload-form col-md-6">
-            <h4 class="text-center">Voice Liveness</h4>
-            <hr />
-            <form asp-action="UploadAudioFile" method="post" enctype="multipart/form-data">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label for="EmployeeID">Employee ID:</label>
-                    <input asp-for="EmployeeID" class="form-control" />
-                    <span asp-validation-for="EmployeeID" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label for="Email">Email:</label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-                <div class="form-group file-input">
-                    <label for="audioFile">Choose Audio File:</label>
-                    <input type="file" name="file" id="audioFile" class="form-control" accept=".mp3, .wav, .ogg" required />
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Upload" class="btn btn-primary btn-block" />
-                </div>
-            </form>
-        </div>
+        <img src="/css/Images/audiogif.gif" class="waiting-img">
+        <p>
+            Please wait while we validate your information, this may take up to 5 seconds.<br>
+            Thank you for your patience.
+        </p>
     </div>
 
+
+
+
+
+    @{
+        Model.EmployeeID = @ViewBag.EmployeeID;
+    }
+    <div id="myModal" class="modal">
+        <div id="modalContent"></div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            startRecording();
+        });
+
+        function startRecording() {
+            var countdown = 5; // 5 seconds recording
+            var audioChunks = [];
+            var mediaRecorder = null;
+            var options = { mimeType: 'audio/webm' };
+
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function (stream) {
+                    mediaRecorder = new MediaRecorder(stream, options);
+                    mediaRecorder.start();
+
+                    setTimeout(function () {
+                        mediaRecorder.stop();
+                        stream.getTracks().forEach(track => track.stop());
+                        submitForm();
+                    }, countdown * 1000);
+
+                    mediaRecorder.addEventListener("dataavailable", function (event) {
+                        audioChunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener("stop", function () {
+                        var blob = new Blob(audioChunks, { type: 'audio/webm' });
+                        var formData = new FormData();
+                        formData.append('File', blob);
+                        formData.append('EmployeeID', '@ViewBag.EmployeeID');
+                        formData.append('Email', '@ViewBag.Email');
+
+                        $.ajax({
+                            url: '/Audio/UploadAudioFile',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                $('#modalContent').html(data);
+                                $('#myModal').modal('show');
+                            },
+                            error: function () {
+                                console.log('Error processing audio');
+                            }
+                        });
+                    });
+                })
+                .catch(function (error) {
+                    console.log('Error starting recording:', error);
+                });
+        }
+    </script>
 </body>
 </html>
