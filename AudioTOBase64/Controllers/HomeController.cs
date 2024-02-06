@@ -17,32 +17,7 @@ namespace AudioTOBase64.Controllers
             _logger = logger;
             _configuration = configuration;
         }
-        public async Task<IActionResult> resultPage(Class model)
-        {
-            if (model.File == null || model.File == null || model.File.Length == 0)
-            {
-                return BadRequest("Invalid file");
-            }
-
-            try
-            {
-                Audio audioRepository = new Audio(_configuration);
-                string response = await audioRepository.PostAudio(model);
-                ViewBag.EmployeeID = model.EmployeeID;
-                ViewBag.Email = model.Email;
-                ViewBag.Time = DateTime.Now;
-                ViewBag.Base64String = response;
-                string checkstring = response.Substring(0, 3);
-                TempData["checkstring"] = checkstring;
-                TempData["result"] = response;
-                ViewBag.result = response;
-                return View();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+       
         public IActionResult Index()
         {
             return View();

@@ -59,55 +59,7 @@ namespace AudioTOBase64.Controllers
         }
 
 
-        public IActionResult resultPage()
-        {
-            string checkstring = TempData["checkstring"] as string;
-            string result = TempData["result"] as string;
-            ViewBag.checkstring = checkstring;
-            ViewBag.result = result;
-            return View();
-        }
-
-        public IActionResult UploadAudioFile()
-        {
-            var model = new Class
-            {
-                EmployeeID = TempData["EmployeeID"] as string,
-                Email = TempData["Email"] as string
-            };
-            ViewBag.EmployeeID = model.EmployeeID;
-            ViewBag.Email = model.Email;
-            ViewBag.result = null;
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UploadAudioFile(Class model)
-        {
-            if (model.File == null || model.File == null || model.File.Length == 0)
-            {
-                return BadRequest("Invalid file");
-            }
-            
-            try
-            {
-                Audio audioRepository = new Audio(_configuration);
-                string response = await audioRepository.PostAudio(model);
-                ViewBag.EmployeeID = model.EmployeeID;
-                ViewBag.Email = model.Email;
-                ViewBag.Time = DateTime.Now;
-                ViewBag.Base64String = response;
-                string checkstring = response.Substring(0, 3);
-                TempData["checkstring"] = checkstring;
-                TempData["result"] = response;
-                ViewBag.result = response;
-                return RedirectToAction("resultPage");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+       
 
     }
 }
