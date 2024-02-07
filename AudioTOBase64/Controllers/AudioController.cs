@@ -14,10 +14,11 @@ namespace AudioTOBase64.Controllers
     {
 
         private readonly IConfiguration _configuration;
-
-        public AudioController(IConfiguration configuration)
+        private readonly ILogger<AudioController> _logger;
+        public AudioController(IConfiguration configuration, ILogger<AudioController> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
         public IActionResult Index()
         {
@@ -53,6 +54,7 @@ namespace AudioTOBase64.Controllers
                 ViewBag.result = response;
                 TempData["EmployeeID"] = model.EmployeeID;
                 TempData["Email"] = model.Email;
+                //_logger.LogInformation(model.Email,model.EmployeeID);
                 return View();
             }
             catch (Exception ex)
