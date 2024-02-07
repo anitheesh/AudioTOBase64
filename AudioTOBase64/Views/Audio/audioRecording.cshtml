@@ -1,8 +1,6 @@
 ﻿@{
     var result = ViewBag.result as string;
-    string Successcontainer = null;
-    string nullcontainer = null;
-    int loading = 0;
+   
 }
 
 
@@ -319,8 +317,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        //For text input
-        var quotes = ["My voice is my password. verify me", "You can get in without your password","My name is unknown to you",];
+        var quotes = @Html.Raw(Json.Serialize(ViewBag.PromptValue)); 
         var numberOfQuotes = quotes.length;
         var currentIndex = 0;
 
@@ -332,7 +329,7 @@
 
         //For Audio record
         function startRecording() {
-            var countdown = 15; // 15 seconds recording
+            var countdown = 15; 
             var audioChunks = [];
             var mediaRecorder = null;
             var options = { mimeType: 'audio/webm' };

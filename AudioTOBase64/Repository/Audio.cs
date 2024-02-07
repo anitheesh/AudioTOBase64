@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,52 +31,12 @@ namespace AudioTOBase64.Repository
         public async Task<string> PostAudio(Class model)
         {
 
-            string audioString = null;
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 await model.File.CopyToAsync(memoryStream);
 
                 string base64String = Convert.ToBase64String(memoryStream.ToArray());
-                Connect();
-                SqlCommand cmd = new SqlCommand("SelectEmp", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@email", model.Email);
-                cmd.Parameters.AddWithValue("@EmployeeId", model.EmployeeID);
-                connection.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            audioString = reader.GetString(0);
-                        }
-                    }
-                    
-                }
-                if(audioString != null) {
-                    string checkstring = audioString.Substring(0, 3);
-
-                    if (checkstring == base64String.Substring(0, 3))
-                    {
-                        return await PostToExternalApi(base64String, model);
-                    }
-
-                    
-                }
-                else
-                {
-                    SqlCommand cmdinsert = new SqlCommand("insertvalue", connection);
-                    cmdinsert.CommandType = CommandType.StoredProcedure;
-                    cmdinsert.Parameters.AddWithValue("@email", model.Email);
-                    cmdinsert.Parameters.AddWithValue("@Employeeid", model.EmployeeID);
-                    cmdinsert.Parameters.AddWithValue("@audio", base64String);
-                    int result = cmdinsert.ExecuteNonQuery();
-                    return await PostToExternalApi(base64String, model);
-
-                }
-                connection.Close();
-                return "Fail";
+                return await PostToExternalApi(base64String, model);
 
             }
         }
@@ -109,8 +70,7 @@ namespace AudioTOBase64.Repository
                     }
                     else
                     {
-                        // If the request fails, throw an exception with the error message
-                        throw new Exception("Fail");
+                        return "Fail";
                     }
                 }
             }
@@ -119,5 +79,35 @@ namespace AudioTOBase64.Repository
                 throw new Exception("Fail");
             }
         }
+        public string[] GetRandomPromptsFromDatabase()
+        {
+            Connect();
+
+            string[] arrayvalue = new string[3];
+            int i = 0;
+
+            connection.Open();
+
+            string query = "SELECT TOP (@Count) * FROM AudioPrompts WHERE IsActivePrompt = 1 ORDER BY NEWID()";
+
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@Count", 3);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        arrayvalue[i] = reader["Prompt"].ToString();
+                        i++;
+                    }
+                }
+            }
+
+            connection.Close(); // Close the connection after usage
+
+            return arrayvalue;
+        }
+
     }
 }

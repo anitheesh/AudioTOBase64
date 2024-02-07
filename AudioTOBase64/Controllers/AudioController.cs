@@ -25,6 +25,10 @@ namespace AudioTOBase64.Controllers
         }
         public IActionResult audioRecording()
         {
+            Audio audioRepository = new Audio(_configuration);
+            string[] promptValue = new string[3];
+            promptValue = audioRepository.GetRandomPromptsFromDatabase();
+            ViewBag.PromptValue = promptValue;
             return View();
         }
         [HttpPost]
