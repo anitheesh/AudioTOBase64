@@ -1,4 +1,4 @@
-﻿// Audio class
+﻿
 using AudioTOBase64.Models;
 using System;
 using System.Data;
@@ -79,20 +79,17 @@ namespace AudioTOBase64.Repository
                 throw new Exception("Fail");
             }
         }
-        public string[] GetRandomPromptsFromDatabase()
+        public string[] GetRandomPromptsFromDatabase(int count = 3)
         {
             Connect();
 
-            string[] arrayvalue = new string[3];
+            string[] arrayvalue = new string[count];
             int i = 0;
-
             connection.Open();
-
             string query = "SELECT TOP (@Count) * FROM AudioPrompts WHERE IsActivePrompt = 1 ORDER BY NEWID()";
-
             using (SqlCommand command = new SqlCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@Count", 3);
+                command.Parameters.AddWithValue("@Count", count);
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -108,6 +105,8 @@ namespace AudioTOBase64.Repository
 
             return arrayvalue;
         }
+
+
 
     }
 }
